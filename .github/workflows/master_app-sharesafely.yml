@@ -19,36 +19,24 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Build
-        run: dotnet build ShareSafely.API/ShareSafely.API.csproj \
-          --configuration Release
+        run: dotnet build ShareSafely.API/ShareSafely.API.csproj --configuration Release
 
       - name: Publish
-        run: dotnet publish ShareSafely.API/ShareSafely.API.csproj \
-          --configuration Release \
-          --output ./publish
+        run: dotnet publish ShareSafely.API/ShareSafely.API.csproj --configuration Release --output ./publish
 
       - name: Zip publish output
-        run: |
-          cd publish
-          zip -r ../publish.zip .
+        run: cd publish && zip -r ../publish.zip . && cd ..
 
-      # ↓ Logs in using Service Principal instead of Basic Auth
       - name: Login to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ↓ Deploys using Azure CLI — no publish profile needed
       - name: Deploy to Azure Web App
         uses: azure/cli@v1
         with:
           azcliversion: latest
-          inlineScript: |
-            az webapp deploy \
-              --name app-sharesafely \
-              --resource-group rg-sharesafely \
-              --src-path ./publish.zip \
-              --type zip
+          inlineScript: az webapp deploy --name app-sharesafely --resource-group rg-sharesafely --src-path ./publish.zip --type zip
 
       - name: Logout
         run: az logout
