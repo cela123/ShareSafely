@@ -27,7 +27,7 @@ public class BlobService : IBlobService
     {
         if (_blobClient is null)
         {
-            var connStr = await _keyVault.GetSecretAsync("StorageConnectionString");
+            var connStr = await _keyVault.GetSecretAsync("ShareSafelyStorageConnectionString");
             _blobClient = new BlobServiceClient(connStr);
         }
         return _blobClient.GetBlobContainerClient(_containerName);
@@ -63,7 +63,7 @@ public class BlobService : IBlobService
 
     public async Task<string> GenerateSasLinkAsync(string blobName, int expiryHours)
     {
-        var connStr = await _keyVault.GetSecretAsync("StorageConnectionString");
+        var connStr = await _keyVault.GetSecretAsync("ShareSafelyStorageConnectionString");
         var container = await GetContainerAsync();
 
         // Parse account credentials from connection string
